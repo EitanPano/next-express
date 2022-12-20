@@ -3,8 +3,11 @@ import { userService } from '../user/service';
 // import logger from '../../services/logger.service';
 
 async function signUp(userCreds: any) {
-    const saltRounds = 10;
+    const saltRounds = +process.env.SALT_ROUNDS! || 10;
     const password = await bcrypt.hash(userCreds.password, saltRounds);
+
+    console.log(saltRounds);
+    
 
     return userService.add({ ...userCreds, password });
 }

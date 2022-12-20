@@ -6,7 +6,7 @@
         "lib": ["es2019"],
         "target": "es2019",
         "isolatedModules": false,
-        "noEmit": false
+        "noEmit": false,
     },
     "exclude": ["src"],
     "include": ["server"]

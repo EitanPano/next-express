@@ -29,6 +29,12 @@ async function getUserById(req: Request, res: Response) {
 
 async function addUser(req: Request, res: Response) {
     try {
+        const newUser = req.body;
+        if (newUser) newUser.isAdmin = false;
+        logger.debug("newUser: ", newUser)
+        
+        const user = await userService.add(newUser);
+        res.send(user);
     } catch (err: any) {
         logger.error('Failed to add user', err);
         res.status(500).send({ err: 'Failed to add user' });

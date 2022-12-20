@@ -2,15 +2,19 @@ import { Request, Response } from 'express'
 import { authService } from './service';
 import logger from '../../services/logger.service';
 
+// I Don't know why removing this makes errors
+import { iSession } from '../../config/session.config'
+import { User } from '../../models/User.model';
+
 async function signUp(req: Request, res: Response) {
     try {
-        const newUser = req.body;
-        newUser.isAdmin = false
-        // console.log(newUser);
-        const user = await authService.signUp(newUser);
-        req.session.user = user
+        const userCreds: User = req.body;
+        // userCreds.isAdmin = false
+        const user = await authService.signUp(userCreds);
+        (req.session as iSession).user = user;
+        // req.session.user = user;
+
         res.json(user);
-        // console.log('user: ', user);
     } catch (err: any) {
         logger.error('Failed to create a new user', err);
         res.status(500).send({ err: 'Failed to sign-up.' });
@@ -21,7 +25,9 @@ async function logIn(req: Request, res: Response) {
     try {
         const userCreds = req.body;
         const user = await authService.logIn(userCreds);
-        req.session.user = user
+        (req.session as iSession).user = user;
+        // req.session.user = user;
+
         res.json(user);
     } catch (err: any) {
         logger.error('Failed to log-in', err);
