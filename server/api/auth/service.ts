@@ -6,9 +6,6 @@ async function signUp(userCreds: any) {
     const saltRounds = +process.env.SALT_ROUNDS! || 10;
     const password = await bcrypt.hash(userCreds.password, saltRounds);
 
-    console.log(saltRounds);
-    
-
     return userService.add({ ...userCreds, password });
 }
 

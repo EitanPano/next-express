@@ -15,12 +15,9 @@ const validateData = (data: any, path: string) => {
     if (!schema) {
         logger.warn('End-point not found: ', endPoint);
         throw new Error('Invalid Endpoint');
-        // return false;
     }
     const validate = ajv.compile(schema)
     const isValid = validate(data)
-    console.log(isValid);
-    
 
     if (!isValid) {
         logger.warn('Invalid data inserted, Check for the required fields.');
@@ -44,6 +41,8 @@ const _getSchema = (model: string) => {
             return userSchema
         case 'review':
             return reviewSchema
+
+        default: return null;
     }
 }
 
