@@ -24,8 +24,8 @@ async function _connect() {
     try {
         // logger.info("dbconnection:", dbURL);
         // logger.info("dbconnection:", dbName);
-        const client = await MongoClient.connect(dbURL, { useNewUrlParser: true, useUnifiedTopology: true });
-        const db = client.db(dbName);
+        const client = await MongoClient.connect(dbURL);
+        const db = await client.db(dbName);
         
         dbConn = db;
         logger.info(`MongoDB Connected: ${db.namespace}`);
