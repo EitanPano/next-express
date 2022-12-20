@@ -44,17 +44,17 @@ function doLog(level: string, ...args: any) {
 }
 
 const loggerService = {
-    debug(...args: string[]) {
+    debug(...args: any[]) {
         if (process.env.NODE_NEV === 'production') return
         doLog('DEBUG', ...args);
     },
-    info(...args: string[]) {
+    info(...args: any[]) {
         doLog('INFO', ...args);
     },
-    warn(...args: string[]) {
+    warn(...args: any[]) {
         doLog('WARN', ...args);
     },
-    error(...args: string[]) {
+    error(...args: any[]) {
         doLog('ERROR', ...args);
     },
 }
