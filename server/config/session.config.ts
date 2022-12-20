@@ -15,7 +15,7 @@ export interface iSession extends Session {
 }
 
 const session = expressSession({
-  store: new MongoStore({ mongoUrl: dbURL, collectionName: dbName }),
+  store: new MongoStore({ mongoUrl: dbURL, dbName }),
   secret: 'I Love Coding',
   resave: false,
   saveUninitialized: true,
