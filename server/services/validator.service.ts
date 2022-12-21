@@ -30,7 +30,7 @@ const validateData = (data: any, path: string) => {
             console.log(validate.errors);
 
 
-            error.params.errors.forEach(err => {
+            error.params.errors.forEach((err: any) => {
                 const type = err.keyword;
                 let msg: string;
                 if (field === 'password' && type === 'pattern') msg = error.message!;
