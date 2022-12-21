@@ -4,4 +4,4 @@ export const dbURL = process.env.NODE_ENV === 'production'
 
 export const dbName = process.env.NODE_ENV === 'production'
     ? process.env.DB_NAME!
-    : "local"
+    : "playground"

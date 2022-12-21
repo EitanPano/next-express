@@ -19,15 +19,12 @@ export async function getCollection(collectionName: string) {
 }
 
 async function _connect() {
-    // console.log('dbURL: ', dbURL);
     if (dbConn) return dbConn;
     try {
-        // logger.info("dbconnection:", dbURL);
-        // logger.info("dbconnection:", dbName);
         const client = await MongoClient.connect(dbURL);
-        const db = await client.db(dbName);
-        
+        const db = client.db(dbName);
         dbConn = db;
+
         logger.info(`MongoDB Connected: ${db.namespace}`);
         return db;
     } catch (err) {

@@ -1,6 +1,7 @@
 import logger from './logger.service';
 import Ajv from 'ajv';
-import addFormats from "ajv-formats"
+import addFormats from "ajv-formats";
+import addErrors from 'ajv-errors';
 
 const validateData = (data: any, path: string) => {
     const endPoint = _getEndPoint(path);
@@ -9,38 +10,56 @@ const validateData = (data: any, path: string) => {
         useDefaults: true,
         removeAdditional: 'all',
     });
-    addFormats(ajv)
+    addFormats(ajv);
+    addErrors(ajv);
 
-    const schema = _getSchema(endPoint)
+    const schema = _getSchema(endPoint);
     if (!schema) {
-        logger.warn('End-point not found: ', endPoint);
+        logger.error('End-point not found: ', endPoint);
         throw new Error('Invalid Endpoint');
     }
-    const validate = ajv.compile(schema)
-    const isValid = validate(data)
+    const validate = ajv.compile(schema);
+    const isValid = validate(data);
 
-    if (!isValid) {
-        logger.warn('Invalid data inserted, Check for the required fields.');
-        return false;
+    const errors: any = []
+    if (!isValid && validate.errors) {
+        validate.errors.forEach(error => {
+            const field = error.instancePath.substring(1, error.instancePath.length)
+            const properties: any = []
+
+            console.log(validate.errors);
+
+
+            error.params.errors.forEach(err => {
+                const type = err.keyword;
+                let msg: string;
+                if (field === 'password' && type === 'pattern') msg = error.message!;
+                else if (field === 'email' && type === 'format') msg = error.message!;
+                else msg = err.message;
+                properties.push({ type, msg })
+            })
+
+            errors.push({ field, properties })
+        })
     }
 
-    return true;
+    return { isValid, errors };
 }
 
 const _getEndPoint = (path: string) => {
     const startIdx = path.indexOf("/", 1);
     const endIdx = path.indexOf("/", startIdx + 1);
     const endPoint = path.substring(startIdx + 1, endIdx);
-    logger.info('endPoint: ', endPoint)
-    return endPoint
+    logger.debug('endPoint', endPoint);
+    return endPoint;
 };
 
 const _getSchema = (model: string) => {
     switch (model) {
         case 'auth':
-            return userSchema
+            return userSchema;
         case 'review':
-            return reviewSchema
+            return reviewSchema;
 
         default: return null;
     }
@@ -52,13 +71,17 @@ const userSchema = {
         fullName: { type: 'string', default: '' },
         username: { type: 'string' },
         email: { type: 'string', format: 'email' },
-        password: { type: 'string' },
-        isAdmin: { type: 'boolean', default: false },
-        points: { type: 'number', default: 10 },
-        reviewCount: { type: 'number', default: 0 },
+        password: { type: 'string', minLength: 8, maxLength: 16, pattern: "^(?=.*?[a-z])(?=.*?[A-Z])((?=.*?[0-9])|(?=.*?[+!?@#$%^&*-])).{8,16}$" },
+        // isAdmin: { type: 'boolean', default: false },
     },
     required: ['email', 'username', 'password'],
-}
+    errorMessage: {
+        properties: {
+            email: 'Email should look like <example@email.com>.',
+            password: 'Password requires minimum 1 Lowercase, 1 Uppercase, and 1 Digit or Special-Character'
+        },
+    },
+};
 
 const reviewSchema = {
     type: 'object',
@@ -71,7 +94,7 @@ const reviewSchema = {
         createdAt: { type: 'number', default: Date.now() },
     },
     required: ['userId', 'productId', 'title', 'rating'],
-}
+};
 
 
 export { validateData };
